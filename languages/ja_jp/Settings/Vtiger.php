@@ -394,6 +394,8 @@ $languageStrings = array(
 	'Workflow' => 'ワークフロー',
 	'LanguageConverter' => '文言変更',
 	'LBL_LANGUAGECONVERTER_DESCRIPTION' => '表示文言を変更します',
+
+	'ModuleBuilder' => 'モジュールビルダー',
 );
 
 $jsLanguageStrings = array(
