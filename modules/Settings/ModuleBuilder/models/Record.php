@@ -263,10 +263,7 @@ class Settings_ModuleBuilder_Record_Model extends Settings_Vtiger_Record_Model {
         global $adb;
 
         $module = Vtiger_Module_Model::getInstance($this->getId());
-        if($module->basetableid) {
-            if(!$module->entityidfield) $module->entityidfield = $module->basetableid;
-            if(!$module->entityidcolumn)$module->entityidcolumn= $module->basetableid;
-        }
+        $main_id = strtolower($this->get("name")).'id';
 
         $fields = $module->getFieldsByType(array('string', 'text', 'number', 'date', 'picklist', 'phone', 'email', 'url','salutation',));
 
@@ -307,8 +304,9 @@ class Settings_ModuleBuilder_Record_Model extends Settings_Vtiger_Record_Model {
             $adb->pquery("UPDATE vtiger_entityname SET tablename = ?, fieldname = ? WHERE modulename = ?
                 ",array($table,$this->get('linkfield'),$this->get('name')));
         } else {
+            // 既存モジュールに対しては正しくentityidfieldやentityidcolumnがセットされないので注意
             $adb->pquery("INSERT INTO vtiger_entityname(tabid,modulename,tablename,fieldname,entityidfield,entityidcolumn) VALUES(?,?,?,?,?,?)
-                ",array($module->id, $module->name, $table, $this->get('linkfield'),$module->entityidfield, $module->entityidcolumn));
+                ",array($module->id, $module->name, $table, $this->get('linkfield'),$main_id, $main_id));
         }
 
         // labelを更新
