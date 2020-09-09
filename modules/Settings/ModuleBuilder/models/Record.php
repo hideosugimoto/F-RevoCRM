@@ -201,26 +201,7 @@ class Settings_ModuleBuilder_Record_Model extends Settings_Vtiger_Record_Model {
         $module->initWebservice();
         $module->setDefaultSharing('Public_ReadWriteDelete');
 
-        // モジュールの作成（ファイル）
-        if(!file_exists("modules/".$module->name)) {
-            mkdir('modules/'.$module->name);
-        }
-
-        $moduleFileContents = file_get_contents('vtlib/ModuleDir/6.0.0/ModuleName.php');
-        $moduleFileContents = preg_replace('/ModuleName/', $module->name, $moduleFileContents);
-        $moduleFileContents = preg_replace('/<modulename>/', strtolower($module->name), $moduleFileContents);
-        file_put_contents('modules/'.$module->name.'/'.$module->name.'.php', $moduleFileContents);
-
-        $moduleLangContents = file_get_contents('vtlib/ModuleDir/6.0.0/languages/en_us/ModuleName.php');
-        $moduleLangContents = preg_replace('/ModuleName/', $module->name, $moduleLangContents);
-        $moduleLangContents = preg_replace('/Module Name/', $this->get('label'), $moduleLangContents);
-        $moduleLangContents = preg_replace('/LBL_MODULEBLOCK_INFORMATION/', $blockInstance->label, $moduleLangContents);
-        $moduleLangContents = preg_replace('/ModuleBlock Information/', 'Basic Information', $moduleLangContents);
-        file_put_contents('languages/en_us/'.$module->name.'.php', $moduleFileContents);
-
-        $moduleLangContents = preg_replace('/Basic Information/', '基本情報', $moduleLangContents);
-        $moduleLangContents = preg_replace('/Custom Information/', '詳細情報', $moduleLangContents);
-        file_put_contents('languages/ja_jp/'.$module->name.'.php', $moduleLangContents);
+        $this->createFiles($module, $blockInstance);
 
         // メニューの追加
         $result = $adb->query("SELECT distinct appname FROM vtiger_app2tab");
@@ -259,10 +240,40 @@ class Settings_ModuleBuilder_Record_Model extends Settings_Vtiger_Record_Model {
 
     }
 
+    private function createFiles($module, $blockInstance) {
+        // モジュールの作成（ファイル）
+        if(!file_exists("modules/".$module->name)) {
+            mkdir('modules/'.$module->name);
+        }
+
+        if(!file_exists('modules/'.$module->name.'/'.$module->name.'.php')) {
+            $moduleFileContents = file_get_contents('vtlib/ModuleDir/6.0.0/ModuleName.php');
+            $moduleFileContents = preg_replace('/ModuleName/', $module->name, $moduleFileContents);
+            $moduleFileContents = preg_replace('/<modulename>/', strtolower($module->name), $moduleFileContents);
+            file_put_contents('modules/'.$module->name.'/'.$module->name.'.php', $moduleFileContents);
+        }
+
+        if(!file_exists('languages/ja_jp/'.$module->name.'.php')) {
+            $moduleLangContents = file_get_contents('vtlib/ModuleDir/6.0.0/languages/en_us/ModuleName.php');
+            $moduleLangContents = preg_replace('/ModuleName/', $module->name, $moduleLangContents);
+            $moduleLangContents = preg_replace('/Module Name/', $this->get('label'), $moduleLangContents);
+            $moduleLangContents = preg_replace('/LBL_MODULEBLOCK_INFORMATION/', $blockInstance->label, $moduleLangContents);
+            $moduleLangContents = preg_replace('/ModuleBlock Information/', 'Basic Information', $moduleLangContents);
+            file_put_contents('languages/en_us/'.$module->name.'.php', $moduleFileContents);
+
+            $moduleLangContents = preg_replace('/Basic Information/', '基本情報', $moduleLangContents);
+            $moduleLangContents = preg_replace('/Custom Information/', '詳細情報', $moduleLangContents);
+            file_put_contents('languages/ja_jp/'.$module->name.'.php', $moduleLangContents);
+            }
+    }
+
     private function updateEntityName() {
         global $adb;
 
         $module = Vtiger_Module_Model::getInstance($this->getId());
+        $blockInstance = Vtiger_Block::getInstance('LBL_BASIC_INFORMATION');
+        $this->createFiles($module, $blockInstance);
+
         $main_id = strtolower($this->get("name")).'id';
 
         $fields = $module->getFieldsByType(array('string', 'text', 'number', 'date', 'picklist', 'phone', 'email', 'url','salutation',));
