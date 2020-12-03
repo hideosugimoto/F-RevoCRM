@@ -37,6 +37,7 @@ $languageStrings = array(
 	'End Period' => '終了時期',
 	'Payment Duration' => '支払い期限',
 	'Invoice Status' => '請求ステータス',
+	'Next Invoice Date' => '次回請求日',
 
 	//Added for existing Picklist Entries
 
