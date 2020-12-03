@@ -73,7 +73,7 @@
 <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
 	<tbody>
 		<tr>
-			<td><span style="font-size: 11px;">$quotes-subject$</span></td>
+			<td><span style="font-size: 11px;">$salesorder-subject$</span></td>
 		</tr>
 	</tbody>
 </table>
