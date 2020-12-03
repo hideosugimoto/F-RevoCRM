@@ -54,6 +54,8 @@ $languageStrings = array(
 	//F-RevoCRM
 	'Open Purchase Orders' => '登録済み発注',
 	'Received Purchase Orders' => '入庫済み受注',
+
+	'Quote Name' => '見積名',
 );
 
 $jsLanguageStrings = array(
