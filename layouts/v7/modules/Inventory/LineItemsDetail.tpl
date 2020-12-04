@@ -355,7 +355,7 @@
                 </div>
             </td>
         </tr>
-        {if $MODULE_NAME eq 'Invoice' or $MODULE_NAME eq 'PurchaseOrder'}
+        {if $MODULE_NAME eq 'Invoice' or $MODULE_NAME eq 'PurchaseOrder' or $MODULE eq 'Payment'}
             <tr>
                 <td width="83%">
                     {if $MODULE_NAME eq 'Invoice'}

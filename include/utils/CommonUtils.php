@@ -490,6 +490,10 @@ function getInvoiceStatus($invoiceId) {
 	return Vtiger_Functions::getInvoiceStatus($invoiceId);
 }
 
+function getPaymentStatus($paymentId) {
+	return Vtiger_Functions::getPaymentStatus($paymentId);
+}
+
 function decimalFormat($value){
 	return Vtiger_Functions::formatDecimal($value);
 }
