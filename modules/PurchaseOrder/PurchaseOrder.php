@@ -618,6 +618,44 @@ class PurchaseOrder extends CRMEntity {
 	function getMandatoryImportableFields() {
 		return getInventoryImportableMandatoryFeilds($this->moduleName);
 	}
+
+	/** Function to get the payments associated with the Purchase Order
+	 *  This function accepts the id as arguments and execute the MySQL query using the id
+	 *  and sends the query and the id as arguments to renderRelatedPayments() method.
+	 */
+	function get_payments($id)
+	{
+		global $log,$singlepane_view;
+		$log->debug("Entering get_payments(".$id.") method ...");
+		require_once('modules/Payment/Payment.php');
+
+		$focus = new Payment();
+
+		$button = '';
+		if($singlepane_view == 'true')
+			$returnset = '&return_module=PurchaseOrder&return_action=DetailView&return_id='.$id;
+		else
+			$returnset = '&return_module=PurchaseOrder&return_action=CallRelatedList&return_id='.$id;
+
+		$userNameSql = getSqlForNameInDisplayFormat(array('last_name' => 'vtiger_users.last_name', 'first_name' => 'vtiger_users.first_name', ), 'Users');
+		$query = "select vtiger_crmentity.*, vtiger_payment.*, vtiger_account.accountname,
+		vtiger_purchaseorder.subject as purchasesubject, case when
+			(vtiger_users.user_name not like '') then $userNameSql else vtiger_groups.groupname
+			end as user_name from vtiger_payment
+			inner join vtiger_crmentity on vtiger_crmentity.crmid=vtiger_payment.paymentid
+			left outer join vtiger_account on vtiger_account.accountid=vtiger_payment.accountid
+			inner join vtiger_purchaseorder on vtiger_purchaseorder.purchaseorderid=vtiger_payment.purchaseorderid
+            LEFT JOIN vtiger_paymentcf ON vtiger_paymentcf.paymentid = vtiger_payment.paymentid
+			LEFT JOIN vtiger_paymentbillads ON vtiger_paymentbillads.paymentbilladdressid = vtiger_payment.paymentid
+			LEFT JOIN vtiger_paymentshipads ON vtiger_paymentshipads.paymentshipaddressid = vtiger_payment.paymentid
+			left join vtiger_users on vtiger_users.id=vtiger_crmentity.smownerid
+			left join vtiger_groups on vtiger_groups.groupid=vtiger_crmentity.smownerid
+			where vtiger_crmentity.deleted=0 and vtiger_purchaseorder.purchaseorderid=".$id;
+
+		$log->debug("Exiting get_payments method ...");
+		return GetRelatedList('PurchaseOrder','Payment',$focus,$query,$button,$returnset);
+
+	}
 }
 
 ?>

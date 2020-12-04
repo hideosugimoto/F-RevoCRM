@@ -55,11 +55,13 @@ Class Inventory_Edit_View extends Vtiger_Edit_View {
 			$relatedProducts = $recordModel->getProducts();
 			$viewer->assign('RECORD_ID', $record);
 			$viewer->assign('MODE', 'edit');
-		} elseif (($request->get('salesorder_id') || $request->get('quote_id') || $request->get('invoice_id')) && ($moduleName == 'PurchaseOrder')) {
+		} elseif (($request->get('salesorder_id') || $request->get('quote_id') || $request->get('invoice_id') || $request->get('purchaseorder_id')) && ($moduleName == 'PurchaseOrder')) {
 			if ($request->get('salesorder_id')) {
 				$referenceId = $request->get('salesorder_id');
 			} elseif ($request->get('invoice_id')) {
 				$referenceId = $request->get('invoice_id');
+			}elseif ($request->get('purchaseorder_id')) {
+				$referenceId = $request->get('purchaseorder_id');
 			} else{
 				$referenceId = $request->get('quote_id');
 			}
@@ -72,9 +74,11 @@ Class Inventory_Edit_View extends Vtiger_Edit_View {
 
 			$recordModel = Vtiger_Record_Model::getCleanInstance($moduleName);
 			$recordModel->setRecordFieldValues($parentRecordModel);
-		} elseif ($request->get('salesorder_id') || $request->get('quote_id')) {
+		} elseif ($request->get('salesorder_id') || $request->get('quote_id') || $request->get('purchaseorder_id')) {
 			if ($request->get('salesorder_id')) {
 				$referenceId = $request->get('salesorder_id');
+			} elseif($request->get('purchaseorder_id')){
+				$referenceId = $request->get('purchaseorder_id');
 			} else {
 				$referenceId = $request->get('quote_id');
 			}

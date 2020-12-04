@@ -46,4 +46,10 @@ class PurchaseOrder_Record_Model extends Inventory_Record_Model {
 			$purchaseOrderStatus = $db->query_result($result,0,"postatus");
 			return $purchaseOrderStatus;
 	}
+
+	function getCreatePaymentUrl() {
+		$paymentModuleModel = Vtiger_Module_Model::getInstance('Payment');
+
+		return "index.php?module=".$paymentModuleModel->getName()."&view=".$paymentModuleModel->getEditViewName()."&purchaseorder_id=".$this->getId();
+	}
 }

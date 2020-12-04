@@ -475,7 +475,7 @@
 						<span id="grandTotal" name="grandTotal" class="pull-right grandTotal">{$FINAL.grandTotal}</span>
 					</td>
 				</tr>
-				{if $MODULE eq 'Invoice' or $MODULE eq 'PurchaseOrder'}
+				{if $MODULE eq 'Invoice' or $MODULE eq 'PurchaseOrder' or $MODULE eq 'Payment'}
 					<tr valign="top">
 						<td width="83%" >
 							<div class="pull-right">

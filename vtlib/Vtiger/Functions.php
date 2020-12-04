@@ -1025,6 +1025,13 @@ class Vtiger_Functions {
 		return $invoiceStatus;
 	}
 
+	static function getPaymentStatus($id) {
+		global $adb;
+		$result = $adb->pquery("SELECT paymenttatus FROM vtiger_payment where paymentid=?", array($id));
+		$paymentStatus = $adb->query_result($result,0,'paymentstatus');
+		return $paymentStatus;
+	}
+
 	static function mkCountQuery($query) {
 		// Remove all the \n, \r and white spaces to keep the space between the words consistent.
 		// This is required for proper pattern matching for words like ' FROM ', 'ORDER BY', 'GROUP BY' as they depend on the spaces between the words.

@@ -54,7 +54,7 @@ function vtlib_getModuleNameById($tabid) {
 function vtlib_getModuleNameForSharing() {
 	global $adb;
 	$std_modules = array('Calendar','Leads','Accounts','Contacts','Potentials',
-			'HelpDesk','Campaigns','Quotes','PurchaseOrder','SalesOrder','Invoice','Events');
+			'HelpDesk','Campaigns','Quotes','PurchaseOrder','SalesOrder','Invoice','Events','Payment');
 	$modulesList = getSharingModuleList($std_modules);
 	return $modulesList;
 }
@@ -390,6 +390,18 @@ function __vtlib_get_modulevar_value($module, $varname) {
 					'vtiger_invoicecf' => Array('invoiceid', 'vtiger_invoice', 'invoiceid'),
 					'vtiger_invoiceshipads' => Array('invoiceshipaddressid','vtiger_invoice','invoiceid'),
 					'vtiger_invoicebillads' => Array('invoicebilladdressid','vtiger_invoice','invoiceid'),
+					),
+			),
+			'Payment'=>
+			Array(
+				'IsCustomModule'=>false,
+				'table_name' => 'vtiger_payment',
+				'table_index'=> 'paymentid',
+				'popup_fields'=> Array('subject'),
+				'related_tables'=> Array( 
+					'vtiger_paymentcf' => Array('paymentid', 'vtiger_payment', 'paymentid'),
+					'vtiger_paymentshipads' => Array('paymentshipaddressid','vtiger_payment','paymentid'),
+					'vtiger_paymentbillads' => Array('paymentbilladdressid','vtiger_payment','paymentid'),
 					),
 			),
 			'HelpDesk'=>

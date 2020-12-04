@@ -9,4 +9,23 @@
  *************************************************************************************/
 
 class PurchaseOrder_DetailView_Model extends Inventory_DetailView_Model {
+
+    public function getDetailViewLinks($linkParams) {
+		$currentUserModel = Users_Privileges_Model::getCurrentUserPrivilegesModel();
+
+		$linkModelList = parent::getDetailViewLinks($linkParams);
+		$recordModel = $this->getRecord();
+
+		$paymentModuleModel = Vtiger_Module_Model::getInstance('Payment');
+		if($currentUserModel->hasModuleActionPermission($paymentModuleModel->getId(), 'CreateView')) {
+			$basicActionLink = array(
+				'linktype' => 'DETAILVIEW',
+				'linklabel' => vtranslate('LBL_CREATE').' '.vtranslate($paymentModuleModel->getSingularLabelKey(), 'Payment'),
+				'linkurl' => $recordModel->getCreatePaymentUrl(),
+				'linkicon' => ''
+			);
+			$linkModelList['DETAILVIEW'][] = Vtiger_Link_Model::getInstanceFromValues($basicActionLink);
+		}
+		return $linkModelList;
+	}
 }

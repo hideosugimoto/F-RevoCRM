@@ -1917,6 +1917,11 @@ th {
 .quickPreviewModuleHeader .recordImage.bginvoice {
   background: #d1026c;
 }
+.detailViewContainer .recordImage.bgpayment,
+.overlayDetailHeader .recordImage.bgpayment,
+.quickPreviewModuleHeader .recordImage.bgpayment {
+  background: #d1026c;
+}
 .detailViewContainer .recordImage.bgleads,
 .overlayDetailHeader .recordImage.bgleads,
 .quickPreviewModuleHeader .recordImage.bgleads {
