@@ -26,8 +26,8 @@ class PurchaseOrder extends CRMEntity {
 
 	var $table_name = "vtiger_purchaseorder";
 	var $table_index= 'purchaseorderid';
-	var $tab_name = Array('vtiger_crmentity','vtiger_purchaseorder','vtiger_pobillads','vtiger_poshipads','vtiger_purchaseordercf','vtiger_inventoryproductrel');
-	var $tab_name_index = Array('vtiger_crmentity'=>'crmid','vtiger_purchaseorder'=>'purchaseorderid','vtiger_pobillads'=>'pobilladdressid','vtiger_poshipads'=>'poshipaddressid','vtiger_purchaseordercf'=>'purchaseorderid','vtiger_inventoryproductrel'=>'id');
+	var $tab_name = Array('vtiger_crmentity','vtiger_purchaseorder','vtiger_pobillads','vtiger_poshipads','vtiger_purchaseordercf','vtiger_payment_recurring_info','vtiger_inventoryproductrel');
+	var $tab_name_index = Array('vtiger_crmentity'=>'crmid','vtiger_purchaseorder'=>'purchaseorderid','vtiger_pobillads'=>'pobilladdressid','vtiger_poshipads'=>'poshipaddressid','vtiger_purchaseordercf'=>'purchaseorderid','vtiger_payment_recurring_info'=>'purchaseorderid','vtiger_inventoryproductrel'=>'id');
 	/**
 	 * Mandatory table for supporting custom fields.
 	 */
@@ -445,7 +445,7 @@ class PurchaseOrder extends CRMEntity {
 		}
         $matrix->setDependency('vtiger_purchaseorder',array('vtiger_crmentityPurchaseOrder', "vtiger_currency_info$secmodule",
 				'vtiger_purchaseordercf', 'vtiger_vendorRelPurchaseOrder', 'vtiger_pobillads',
-				'vtiger_poshipads', 'vtiger_inventoryproductrelPurchaseOrder', 'vtiger_contactdetailsPurchaseOrder'));
+				'vtiger_poshipads', 'vtiger_inventoryproductrelPurchaseOrder', 'vtiger_payment_recurring_info','vtiger_contactdetailsPurchaseOrder'));
 
 		$query = $this->getRelationQuery($module,$secmodule,"vtiger_purchaseorder","purchaseorderid",$queryPlanner);
 		if ($queryPlanner->requireTable("vtiger_crmentityPurchaseOrder", $matrix)){
@@ -476,6 +476,9 @@ class PurchaseOrder extends CRMEntity {
 		}
 		if ($queryPlanner->requireTable("vtiger_groupsPurchaseOrder")){
 			$query .= " left join vtiger_groups as vtiger_groupsPurchaseOrder on vtiger_groupsPurchaseOrder.groupid = vtiger_crmentityPurchaseOrder.smownerid";
+		}
+		if ($queryPlanner->requireTable("vtiger_payment_recurring_info")){
+			$query .= " left join vtiger_payment_recurring_info on vtiger_purchaseorder.purchaseorderid = vtiger_payment_recurring_info.purchaseorderid";
 		}
 		if ($queryPlanner->requireTable("vtiger_vendorRelPurchaseOrder")){
 			$query .= " left join vtiger_vendor as vtiger_vendorRelPurchaseOrder on vtiger_vendorRelPurchaseOrder.vendorid = vtiger_purchaseorder.vendorid";
@@ -530,6 +533,13 @@ class PurchaseOrder extends CRMEntity {
 		} else {
 			parent::unlinkRelationship($id, $return_module, $return_id);
 		}
+	}
+
+	public function getJoinClause($tableName) {
+		if ($tableName == 'vtiger_payment_recurring_info') {
+			return 'LEFT JOIN';
+		}
+		return parent::getJoinClause($tableName);
 	}
 
 	function insertIntoEntityTable($table_name, $module, $fileid = '')  {
@@ -592,6 +602,7 @@ class PurchaseOrder extends CRMEntity {
 				LEFT JOIN vtiger_products ON vtiger_products.productid = vtiger_inventoryproductrel.productid
 				LEFT JOIN vtiger_service ON vtiger_service.serviceid = vtiger_inventoryproductrel.productid
 				LEFT JOIN vtiger_contactdetails ON vtiger_contactdetails.contactid = vtiger_purchaseorder.contactid
+				LEFT JOIN vtiger_payment_recurring_info ON vtiger_payment_recurring_info.purchaseorderid = vtiger_purchaseorder.purchaseorderid
 				LEFT JOIN vtiger_vendor ON vtiger_vendor.vendorid = vtiger_purchaseorder.vendorid
 				LEFT JOIN vtiger_currency_info ON vtiger_currency_info.id = vtiger_purchaseorder.currency_id
 				LEFT JOIN vtiger_groups ON vtiger_groups.groupid = vtiger_crmentity.smownerid
@@ -609,6 +620,72 @@ class PurchaseOrder extends CRMEntity {
 		$log->debug("Exiting create_export_query method ...");
 		return $query;
 	}
+
+    function getQueryForDuplicates($module, $tableColumns, $selectedColumns = '', $ignoreEmpty = false,$requiredTables = array()) {
+		if(is_array($tableColumns)) {
+			$tableColumnsString = implode(',', $tableColumns);
+		}
+        $selectClause = "SELECT " . $this->table_name . "." . $this->table_index . " AS recordid," . $tableColumnsString;
+
+        // Select Custom Field Table Columns if present
+        if (isset($this->customFieldTable))
+            $query .= ", " . $this->customFieldTable[0] . ".* ";
+
+        $fromClause = " FROM $this->table_name";
+
+        $fromClause .= " INNER JOIN vtiger_crmentity ON vtiger_crmentity.crmid = $this->table_name.$this->table_index";
+
+		if($this->tab_name) {
+			foreach($this->tab_name as $tableName) {
+				if($tableName != 'vtiger_crmentity' && $tableName != $this->table_name && $tableName != 'vtiger_inventoryproductrel' && in_array($tableName,$requiredTables)) {
+                    if($tableName == 'vtiger_payment_recurring_info') {
+						$fromClause .= " LEFT JOIN " . $tableName . " ON " . $tableName . '.' . $this->tab_name_index[$tableName] .
+							" = $this->table_name.$this->table_index";
+					}elseif($this->tab_name_index[$tableName]) {
+						$fromClause .= " INNER JOIN " . $tableName . " ON " . $tableName . '.' . $this->tab_name_index[$tableName] .
+							" = $this->table_name.$this->table_index";
+					}
+				}
+			}
+		}
+        $fromClause .= " LEFT JOIN vtiger_users ON vtiger_users.id = vtiger_crmentity.smownerid
+						LEFT JOIN vtiger_groups ON vtiger_groups.groupid = vtiger_crmentity.smownerid";
+
+        $whereClause = " WHERE vtiger_crmentity.deleted = 0";
+        $whereClause .= $this->getListViewSecurityParameter($module);
+
+		if($ignoreEmpty) {
+			foreach($tableColumns as $tableColumn){
+				$whereClause .= " AND ($tableColumn IS NOT NULL AND $tableColumn != '') ";
+			}
+		}
+
+        if (isset($selectedColumns) && trim($selectedColumns) != '') {
+            $sub_query = "SELECT $selectedColumns FROM $this->table_name AS t " .
+                    " INNER JOIN vtiger_crmentity AS crm ON crm.crmid = t." . $this->table_index;
+            // Consider custom table join as well.
+            if (isset($this->customFieldTable)) {
+                $sub_query .= " LEFT JOIN " . $this->customFieldTable[0] . " tcf ON tcf." . $this->customFieldTable[1] . " = t.$this->table_index";
+            }
+            $sub_query .= " WHERE crm.deleted=0 GROUP BY $selectedColumns HAVING COUNT(*)>1";
+        } else {
+            $sub_query = "SELECT $tableColumnsString $fromClause $whereClause GROUP BY $tableColumnsString HAVING COUNT(*)>1";
+        }
+
+		$i = 1;
+		foreach($tableColumns as $tableColumn){
+			$tableInfo = explode('.', $tableColumn);
+			$duplicateCheckClause .= " ifnull($tableColumn,'null') = ifnull(temp.$tableInfo[1],'null')";
+			if (count($tableColumns) != $i++) $duplicateCheckClause .= " AND ";
+		}
+
+        $query = $selectClause . $fromClause .
+                " LEFT JOIN vtiger_users_last_import ON vtiger_users_last_import.bean_id=" . $this->table_name . "." . $this->table_index .
+                " INNER JOIN (" . $sub_query . ") AS temp ON " . $duplicateCheckClause .
+                $whereClause .
+                " ORDER BY $tableColumnsString," . $this->table_name . "." . $this->table_index . " ASC";
+        return $query;
+    }
 
 	/**
 	 * Function to get importable mandatory fields

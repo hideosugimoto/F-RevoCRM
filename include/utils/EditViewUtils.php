@@ -77,6 +77,59 @@ function getConvertSoToInvoice($focus,$so_focus,$soid)
 
 }
 
+
+/** This function returns the vtiger_payment object populated with the details from sales order object.
+* Param $focus - Payment object
+* Param $po_focus - Purchase order focus
+* Param $poid - sales order id
+* Return type is an object array
+*/
+
+function getConvertPoToPayment($focus,$po_focus,$poid)
+{
+	global $log,$current_user;
+	$log->debug("Entering getConvertPoToPayment(".get_class($focus).",".get_class($po_focus).",".$poid.") method ...");
+    $log->info("in getConvertPoToPayment ".$poid);
+    $xyz=array('bill_street','bill_city','bill_code','bill_pobox','bill_country','bill_state','ship_street','ship_city','ship_code','ship_pobox','ship_country','ship_state');
+	for($i=0;$i<count($xyz);$i++){
+		if (getFieldVisibilityPermission('PurchaseOrder', $current_user->id,$xyz[$i]) == '0'){
+			$po_focus->column_fields[$xyz[$i]] = $po_focus->column_fields[$xyz[$i]];
+		}
+		else
+			$po_focus->column_fields[$xyz[$i]] = '';
+	}
+	$focus->column_fields['purchaseorder_id'] = $poid;
+	$focus->column_fields['subject'] = $po_focus->column_fields['subject'];
+	$focus->column_fields['customerno'] = $po_focus->column_fields['customerno'];
+	$focus->column_fields['duedate'] = $po_focus->column_fields['duedate'];
+	$focus->column_fields['contact_id'] = $po_focus->column_fields['contact_id'];//to include contact name in Payment
+	$focus->column_fields['account_id'] = $po_focus->column_fields['account_id'];
+	$focus->column_fields['exciseduty'] = $po_focus->column_fields['exciseduty'];
+	$focus->column_fields['salescommission'] = $po_focus->column_fields['salescommission'];
+	$focus->column_fields['vtiger_purchaseorder'] = $po_focus->column_fields['vtiger_purchaseorder'];
+	$focus->column_fields['bill_street'] = $po_focus->column_fields['bill_street'];
+	$focus->column_fields['ship_street'] = $po_focus->column_fields['ship_street'];
+	$focus->column_fields['bill_city'] = $po_focus->column_fields['bill_city'];
+	$focus->column_fields['ship_city'] = $po_focus->column_fields['ship_city'];
+	$focus->column_fields['bill_state'] = $po_focus->column_fields['bill_state'];
+	$focus->column_fields['ship_state'] = $po_focus->column_fields['ship_state'];
+	$focus->column_fields['bill_code'] = $po_focus->column_fields['bill_code'];
+	$focus->column_fields['ship_code'] = $po_focus->column_fields['ship_code'];
+	$focus->column_fields['bill_country'] = $po_focus->column_fields['bill_country'];
+	$focus->column_fields['ship_country'] = $po_focus->column_fields['ship_country'];
+	$focus->column_fields['bill_pobox'] = $po_focus->column_fields['bill_pobox'];
+	$focus->column_fields['ship_pobox'] = $po_focus->column_fields['ship_pobox'];
+	$focus->column_fields['description'] = $po_focus->column_fields['description'];
+	$focus->column_fields['terms_conditions'] = $po_focus->column_fields['terms_conditions'];
+    $focus->column_fields['currency_id'] = $po_focus->column_fields['currency_id'];
+    $focus->column_fields['conversion_rate'] = $po_focus->column_fields['conversion_rate'];
+    $focus->column_fields['pre_tax_total'] = $po_focus->column_fields['pre_tax_total'];
+
+	$log->debug("Exiting getConvertPoToPayment method ...");
+	return $focus;
+
+}
+
 /** This function returns the detailed list of vtiger_products associated to a given entity or a record.
 * Param $module - module name
 * Param $focus - module object
