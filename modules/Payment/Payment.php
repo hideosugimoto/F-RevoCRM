@@ -91,7 +91,7 @@ class Payment extends CRMEntity {
 	//var $groupTable = Array('vtiger_paymentgrouprelation','paymentid');
 
 	var $mandatory_fields = Array('subject','createdtime' ,'modifiedtime', 'assigned_user_id', 'quantity', 'listprice', 'productid');
-	var $_salesorderid;
+	var $_purchaseorderid;
 	var $_recurring_mode;
 
 	// For Alphabetical search
@@ -133,7 +133,7 @@ class Payment extends CRMEntity {
 			unset($_REQUEST['totalProductCount']);
 		}
 		//in ajax save we should not call this function, because this will delete all the existing product values
-		if(isset($this->_recurring_mode) && $this->_recurring_mode == 'recurringpayment_from_so' && isset($this->_salesorderid) && $this->_salesorderid!='') {
+		if(isset($this->_recurring_mode) && $this->_recurring_mode == 'recurringpayment_from_so' && isset($this->_purchaseorderid) && $this->_purchaseorderid!='') {
 			// We are getting called from the RecurringPayment cron service!
 			$this->createRecurringPaymentFromSO();
 
@@ -464,7 +464,7 @@ class Payment extends CRMEntity {
 	 */
 	function createRecurringPaymentFromSO(){
 		global $adb;
-		$salesorder_id = $this->_salesorderid;
+		$salesorder_id = $this->_purchaseorderid;
 		$query1 = "SELECT * FROM vtiger_inventoryproductrel WHERE id=?";
 		$res = $adb->pquery($query1, array($salesorder_id));
 		$no_of_products = $adb->num_rows($res);

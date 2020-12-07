@@ -65,7 +65,71 @@ Inventory_Edit_Js("PurchaseOrder_Edit_Js",{},{
         }
         return params;
     },
-    
+	
+	/**
+	 * Function to register event for enabling recurrence
+	 * When recurrence is enabled some of the fields need
+	 * to be check for mandatory validation
+	 */
+	registerEventForEnablingRecurrence : function(){
+		var thisInstance = this;
+		var form = this.getForm();
+		var enableRecurrenceField = form.find('[name="enable_recurring"]');
+		var fieldNamesForValidation = new Array('recurring_frequency','start_period','end_period','payment_duration','paymentstatus');
+        var selectors = new Array();
+        for(var index in fieldNamesForValidation) {
+            selectors.push('[name="'+fieldNamesForValidation[index]+'"]');
+        }
+        var selectorString = selectors.join(',');
+        var validationToggleFields = form.find(selectorString);
+		enableRecurrenceField.on('change',function(e){
+			var element = jQuery(e.currentTarget);
+			var addValidation;
+			if(element.is(':checked')){
+				addValidation = true;
+			}else{
+				addValidation = false;
+			}
+			
+			//If validation need to be added for new elements,then we need to detach and attach validation
+			//to form
+			if(addValidation){
+				thisInstance.AddOrRemoveRequiredValidation(validationToggleFields, true);
+			}else{
+				thisInstance.AddOrRemoveRequiredValidation(validationToggleFields, false);
+			}
+		})
+		if(!enableRecurrenceField.is(":checked")){
+			thisInstance.AddOrRemoveRequiredValidation(validationToggleFields, false);
+		}else if(enableRecurrenceField.is(":checked")){
+			thisInstance.AddOrRemoveRequiredValidation(validationToggleFields, true);
+		}
+	},
+
+	AddOrRemoveRequiredValidation : function(dependentFieldsForValidation, addValidation) {
+		jQuery(dependentFieldsForValidation).each(function(key,value){
+			var relatedField = jQuery(value);
+			if(addValidation) {
+				relatedField.removeClass('ignore-validation').data('rule-required', true);
+				if(relatedField.is("select")) {
+					relatedField.attr('disabled',false);
+				}else {
+					relatedField.removeAttr('disabled');
+				}
+			} else if(!addValidation) {
+				relatedField.addClass('ignore-validation').removeAttr('data-rule-required');
+				if(relatedField.is("select")) {
+					relatedField.attr('disabled',true).trigger("change");
+					var select2Element = app.helper.getSelect2FromSelect(relatedField);
+					select2Element.trigger('Vtiger.Validation.Hide.Messsage');
+					select2Element.find('a').removeClass('input-error');
+				}else {
+					relatedField.attr('disabled','disabled').trigger('Vtiger.Validation.Hide.Messsage').removeClass('input-error');
+				}
+			}
+		});
+	},
+
     copyAddressFields: function(addressType, targetType){
         var form = this.getForm();
         var company = this.addressDetails[targetType];
@@ -228,7 +292,8 @@ Inventory_Edit_Js("PurchaseOrder_Edit_Js",{},{
 	},
         
         registerBasicEvents: function(container){
-            this._super(container);
+			this._super(container);
+			this.registerEventForEnablingRecurrence();
             this.registerEventForCopyAddress();
             this.registerSelectAddress();
         }

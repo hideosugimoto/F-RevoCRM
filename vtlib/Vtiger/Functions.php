@@ -1027,7 +1027,7 @@ class Vtiger_Functions {
 
 	static function getPaymentStatus($id) {
 		global $adb;
-		$result = $adb->pquery("SELECT paymenttatus FROM vtiger_payment where paymentid=?", array($id));
+		$result = $adb->pquery("SELECT paymentstatus FROM vtiger_payment where paymentid=?", array($id));
 		$paymentStatus = $adb->query_result($result,0,'paymentstatus');
 		return $paymentStatus;
 	}

@@ -56,6 +56,37 @@ $languageStrings = array(
 	'Received Purchase Orders' => '入庫済み受注',
 
 	'Quote Name' => '見積名',
+
+	'Enable Recurring' => '繰り返し有効',
+	'Frequency' => '周期',
+	'Start Period' => '開始時期',
+	'End Period' => '終了時期',
+	'Payment Duration' => '支払い期限',
+	'Payment Status' => '支払ステータス',
+	'Next Payment Date' => '次回支払日',
+
+	'Pending Purchase Orders' => '登録済み発注',
+	'Recurring Payment Information' => '繰り返し支払情報',
+	'Net 01 day' => '1日後',
+    'Net 05 days' => '5日後',
+    'Net 07 days' => '7日後',
+    'Net 10 days' => '10日後',
+    'Net 15 days' => '15日後',
+    'Net 30 days' => '30日後',
+    'Net 45 days' => '45日後',
+	'Net 60 days' => '60日後',
+	'Daily' => '毎日',
+    'Weekly' => '毎週',
+    'Monthly' => '毎月',
+    'Quarterly' => '四半期毎',
+	'Yearly' => '毎年',
+	'Cancel' => 'キャンセル',
+
+	'Sub Total'=>'小計',
+	'AutoCreated'=>'自動作成済み',
+	'Sent'=>'送付済み',
+	'Credit Payment'=>'クレジット払い',
+	'Paid'=>'支払い済み',
 );
 
 $jsLanguageStrings = array(

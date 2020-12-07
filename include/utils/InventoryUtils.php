@@ -454,6 +454,9 @@ function updateInventoryProductRel($entity) {
 	if ($moduleName === 'Invoice') {
 		$statusFieldName = 'invoicestatus';
 		$statusFieldValue = 'Cancel';
+	}else if ($moduleName === 'Payment'){
+		$statusFieldName = 'paymentstatus';
+		$statusFieldValue = 'Cancel';
 	}
 
 	$statusChanged = false;
