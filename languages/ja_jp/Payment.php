@@ -36,6 +36,7 @@ $languageStrings = array(
 	'Payment No' => '支払番号',
 	'LBL_RECEIVED' => '入金済み',
 	'LBL_BALANCE' => '未払い残高',
+	'LBL_PAID' => '支払い済み',
 	//Added for existing Picklist Entries
 
 	'Sent'=>'送付済み',
