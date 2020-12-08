@@ -281,6 +281,7 @@ class PDFTemplates_Module_Model extends Vtiger_Module_Model {
 			'Invoice',
 			'SalesOrder',
 			'PurchaseOrder',
+			'Payment'
 		);
 		return $moduleList;
 	}
