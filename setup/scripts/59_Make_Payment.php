@@ -111,6 +111,9 @@ $field->quickcreate = 1;
 $field->summaryfield = 1;
 $field->label = 'Payment No';
 $blockInstance->addField($field);
+//自動採番項目の設定
+$db->query("INSERT INTO vtiger_modentity_num(num_id, semodule, prefix, start_id, cur_id, active)
+SELECT max(num_id) + 1, 'Payment', 'PAY', 1, 1, 1 FROM vtiger_modentity_num LIMIT 1");
 
 // 顧客番号
 $field = new Vtiger_Field();
@@ -961,5 +964,23 @@ $sourcemodule->setRelatedlist($module, 'Payment', array('ADD'), 'get_payments');
 
 //活動の関連項目の選択肢に支払モジュールを追加
 $db->query("insert into vtiger_ws_referencetype values(34,'Payment')");
+
+/**
+ * ブロックの並び順を変更
+ */
+$blocks = array(
+    'LBL_PO_INFORMATION',
+    'Recurring Payment Information',
+    'LBL_CUSTOM_INFORMATION',
+    'LBL_ADDRESS_INFORMATION',
+    'LBL_RELATED_PRODUCTS',
+    'LBL_ITEM_DETAILS',
+    'LBL_TERMS_INFORMATION',
+    'LBL_DESCRIPTION_INFORMATION',
+);
+foreach ($blocks as $key => $block) {
+    $db->query("UPDATE vtiger_blocks SET sequence = ".($key+1)." WHERE tabid = ".$module->id." AND blocklabel = '".$block."'");
+}
+
 
 echo "実行が完了しました。<br>";
