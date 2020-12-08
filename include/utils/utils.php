@@ -2023,7 +2023,7 @@ function getCurrencyDecimalPlaces($user = null) {
 }
 
 function getInventoryModules() {
-	$inventoryModules = array('Invoice','Quotes','PurchaseOrder','SalesOrder','Payment');
+	$inventoryModules = array('Invoice','Quotes','PurchaseOrder','SalesOrder');
 	return $inventoryModules;
 }
 
