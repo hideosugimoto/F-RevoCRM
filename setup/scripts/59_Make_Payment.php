@@ -97,7 +97,7 @@ $blockInstance->addField($field);
 $field->setRelatedModules(array('PurchaseOrder'));
 
 $oppModuleModel = Vtiger_Module_Model::getInstance('PurchaseOrder');
-$oppModuleModel->setRelatedlist($module, 'Payment', array('ADD'), 'get_payments', $field->id);
+$oppModuleModel->setRelatedlist($module, 'Payment', array(''), 'get_payments', $field->id);
 
 // 支払番号
 $field = new Vtiger_Field();
