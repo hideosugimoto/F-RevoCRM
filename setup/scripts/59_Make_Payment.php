@@ -16,6 +16,7 @@ include_once('modules/Vtiger/models/Module.php');
 require_once('setup/utils/FRFieldSetting.php');
 require_once('setup/utils/FRFilterSetting.php');
 
+require_once('modules/Settings/Vtiger/models/TermsAndConditions.php');
 
 global $log;
 
@@ -673,6 +674,7 @@ $field->typeofdata = 'N~O';
 $field->masseditable = 1;
 $field->quickcreate = 1;
 $field->summaryfield = 1;
+$field->displaytype = 5;
 $field->label = 'Discount Amount';
 $blockInstance->addField($field);
 
@@ -687,6 +689,7 @@ $field->typeofdata = 'N~O';
 $field->masseditable = 1;
 $field->quickcreate = 1;
 $field->summaryfield = 1;
+$field->displaytype = 5;
 $field->label = 'Discount Percent';
 $blockInstance->addField($field);
 
@@ -982,5 +985,10 @@ foreach ($blocks as $key => $block) {
     $db->query("UPDATE vtiger_blocks SET sequence = ".($key+1)." WHERE tabid = ".$module->id." AND blocklabel = '".$block."'");
 }
 
+
+$model = Settings_Vtiger_TermsAndConditions_Model::getInstance($moduleName);
+$model->setText("");
+$model->setType($module_name);
+$model->save();
 
 echo "実行が完了しました。<br>";
