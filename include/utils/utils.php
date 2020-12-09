@@ -2023,7 +2023,11 @@ function getCurrencyDecimalPlaces($user = null) {
 }
 
 function getInventoryModules() {
-	$inventoryModules = array('Invoice','Quotes','PurchaseOrder','SalesOrder');
+	$inventoryModules = array('Invoice','Quotes','PurchaseOrder','SalesOrder','Payment');
+	foreach ($inventoryModules as $key => $modulename) {
+		if(!is_null(Vtiger_Functions::getModuleId($modulename))) continue;
+		unset($inventoryModules[$key]);
+	}
 	return $inventoryModules;
 }
 
