@@ -934,20 +934,20 @@ $module->enableTools(array('Import', 'Export', 'Merge'));
 /**
  * ModCommentsモジュールを関連に追加
  */
-$log->debug("[START] Add Comments function");
-$modules = array('Payment');
-for( $i=0; $i<count($modules); $i++) {
-    $modulename = $modules[$i];
-    $moduleinstance = vtiger_module::getinstance($modulename);
+// $log->debug("[START] Add Comments function");
+// $modules = array('Payment');
+// for( $i=0; $i<count($modules); $i++) {
+//     $modulename = $modules[$i];
+//     $moduleinstance = vtiger_module::getinstance($modulename);
 
-    require_once 'modules/ModComments/ModComments.php';
-    $commentsmodule = Vtiger_Module::getInstance( 'ModComments' );
-    $fieldinstance = Vtiger_Field::getInstance( 'related_to', $commentsmodule );
-    $fieldinstance->setRelatedModules( array($modulename) );
-    $detailviewblock = ModComments::addWidgetTo( $modulename );
-    echo "comment widget for module $modulename has been created";
-}
-$log->debug("[END] Add Comments function");
+//     require_once 'modules/ModComments/ModComments.php';
+//     $commentsmodule = Vtiger_Module::getInstance( 'ModComments' );
+//     $fieldinstance = Vtiger_Field::getInstance( 'related_to', $commentsmodule );
+//     $fieldinstance->setRelatedModules( array($modulename) );
+//     $detailviewblock = ModComments::addWidgetTo( $modulename );
+//     echo "comment widget for module $modulename has been created";
+// }
+// $log->debug("[END] Add Comments function");
 
 
 $db->query("ALTER TABLE vtiger_payment ADD COLUMN compound_taxes_info TEXT");
