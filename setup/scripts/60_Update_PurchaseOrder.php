@@ -163,4 +163,22 @@ $em->registerHandler('vtiger.entity.aftersave', 'modules/PurchaseOrder/Recurring
 vimport('vtlib/Vtiger/Cron.php');
 Vtiger_Cron::register( 'RecurringPayment', 'cron/modules/PurchaseOrder/RecurringPayment.service', 43200, 'PurchaseOrder', 1, 8, 'Recommended frequency for RecurringPayment is 12 hours');
 
+
+/**
+ * 発注モジュールのブロックの並び順を変更
+ */
+$blocks = array(
+    'LBL_PO_INFORMATION',
+    'Recurring Payment Information',
+    'LBL_CUSTOM_INFORMATION',
+    'LBL_ADDRESS_INFORMATION',
+    'LBL_RELATED_PRODUCTS',
+    'LBL_ITEM_DETAILS',
+    'LBL_TERMS_INFORMATION',
+    'LBL_DESCRIPTION_INFORMATION',
+);
+foreach ($blocks as $key => $block) {
+    $db->query("UPDATE vtiger_blocks SET sequence = ".($key+1)." WHERE tabid = ".$module->id." AND blocklabel = '".$block."'");
+}
+
 echo "実行が完了しました。<br>";

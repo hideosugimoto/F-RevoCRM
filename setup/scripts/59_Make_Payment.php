@@ -968,25 +968,7 @@ $sourcemodule->setRelatedlist($module, 'Payment', array('ADD'), 'get_payments');
 //活動の関連項目の選択肢に支払モジュールを追加
 $db->query("insert into vtiger_ws_referencetype values(34,'Payment')");
 
-/**
- * ブロックの並び順を変更
- */
-$blocks = array(
-    'LBL_PO_INFORMATION',
-    'Recurring Payment Information',
-    'LBL_CUSTOM_INFORMATION',
-    'LBL_ADDRESS_INFORMATION',
-    'LBL_RELATED_PRODUCTS',
-    'LBL_ITEM_DETAILS',
-    'LBL_TERMS_INFORMATION',
-    'LBL_DESCRIPTION_INFORMATION',
-);
-foreach ($blocks as $key => $block) {
-    $db->query("UPDATE vtiger_blocks SET sequence = ".($key+1)." WHERE tabid = ".$module->id." AND blocklabel = '".$block."'");
-}
-
-
-$model = Settings_Vtiger_TermsAndConditions_Model::getInstance($moduleName);
+$model = Settings_Vtiger_TermsAndConditions_Model::getInstance($module_name);
 $model->setText("");
 $model->setType($module_name);
 $model->save();
