@@ -2742,6 +2742,76 @@ class ReportRun extends CRMEntity {
 			$query .= " " . $this->getRelatedModulesQuery($module, $this->secondarymodule) .
 					getNonAdminAccessControlQuery($this->primarymodule, $current_user) .
 					" where vtiger_crmentity.deleted=0";
+		} else if ($module == "Payment") {
+			$matrix = $this->queryPlanner->newDependencyMatrix();
+
+			$matrix->setDependency('vtiger_inventoryproductreltmpPayment', array('vtiger_productsPayment', 'vtiger_servicePayment'));
+
+			$query = "from vtiger_payment
+			inner join vtiger_crmentity on vtiger_crmentity.crmid=vtiger_payment.paymentid";
+
+			if ($this->queryPlanner->requireTable("vtiger_paymentbillads")) {
+				$query .=" inner join vtiger_paymentbillads on vtiger_payment.paymentid=vtiger_paymentbillads.paymentbilladdressid";
+			}
+			if ($this->queryPlanner->requireTable("vtiger_paymentshipads")) {
+				$query .=" inner join vtiger_paymentshipads on vtiger_payment.paymentid=vtiger_paymentshipads.paymentshipaddressid";
+			}
+			if ($this->queryPlanner->requireTable("vtiger_currency_info$module")) {
+				$query .=" left join vtiger_currency_info as vtiger_currency_info$module on vtiger_currency_info$module.id = vtiger_payment.currency_id";
+			}
+			// lineItemFieldsInCalculation - is used to when line item fields are used in calculations
+			if ($type !== 'COLUMNSTOTOTAL' || $this->lineItemFieldsInCalculation == true) {
+				// should be present on when line item fields are selected for calculation
+				if ($this->queryPlanner->requireTable("vtiger_inventoryproductreltmpPayment", $matrix)) {
+					$query .=" left join vtiger_inventoryproductrel as vtiger_inventoryproductreltmpPayment on vtiger_payment.paymentid = vtiger_inventoryproductreltmpPayment.id";
+				}
+				if ($this->queryPlanner->requireTable("vtiger_productsPayment")) {
+					$query .=" left join vtiger_products as vtiger_productsPayment on vtiger_productsPayment.productid = vtiger_inventoryproductreltmpPayment.productid";
+				}
+				if ($this->queryPlanner->requireTable("vtiger_servicePayment")) {
+					$query .=" left join vtiger_service as vtiger_servicePayment on vtiger_servicePayment.serviceid = vtiger_inventoryproductreltmpPayment.productid";
+				}
+			}
+			if ($this->queryPlanner->requireTable("vtiger_purchageorderPayment")) {
+				$query .= " left join vtiger_purchageorder as vtiger_purchageorderPayment on vtiger_purchageorderPayment.purchageorderid=vtiger_payment.purchageorderid";
+			}
+			if ($this->queryPlanner->requireTable("vtiger_paymentcf")) {
+				$query .= " left join vtiger_paymentcf on vtiger_payment.paymentid = vtiger_paymentcf.paymentid";
+			}
+			if ($this->queryPlanner->requireTable("vtiger_groupsPayment")) {
+				$query .= " left join vtiger_groups as vtiger_groupsPayment on vtiger_groupsPayment.groupid = vtiger_crmentity.smownerid";
+			}
+			if ($this->queryPlanner->requireTable("vtiger_usersPayment")) {
+				$query .= " left join vtiger_users as vtiger_usersPayment on vtiger_usersPayment.id = vtiger_crmentity.smownerid";
+			}
+
+			// TODO optimize inclusion of these tables
+			$query .= " left join vtiger_groups on vtiger_groups.groupid = vtiger_crmentity.smownerid";
+			$query .= " left join vtiger_users on vtiger_users.id = vtiger_crmentity.smownerid";
+
+			if ($this->queryPlanner->requireTable("vtiger_lastModifiedByPayment")) {
+				$query .= " left join vtiger_users as vtiger_lastModifiedByPayment on vtiger_lastModifiedByPayment.id = vtiger_crmentity.modifiedby";
+			}
+			if ($this->queryPlanner->requireTable('vtiger_createdbyPayment')) {
+				$query .= " left join vtiger_users as vtiger_createdbyPayment on vtiger_createdbyPayment.id = vtiger_crmentity.smcreatorid";
+			}
+			if ($this->queryPlanner->requireTable("vtiger_accountPayment")) {
+				$query .= " left join vtiger_account as vtiger_accountPayment on vtiger_accountPayment.accountid = vtiger_payment.accountid";
+			}
+			if ($this->queryPlanner->requireTable("vtiger_contactdetailsPayment")) {
+				$query .= " left join vtiger_contactdetails as vtiger_contactdetailsPayment on vtiger_contactdetailsPayment.contactid = vtiger_payment.contactid";
+			}
+			if ($this->queryPlanner->requireTable('vtiger_currency_info')) {
+				$query .= ' LEFT JOIN vtiger_currency_info ON vtiger_currency_info.id = vtiger_payment.currency_id';
+			}
+
+			$focus = CRMEntity::getInstance($module);
+			$relquery = $focus->getReportsUiType10Query($module, $this->queryPlanner);
+			$query .= $relquery . ' ';
+
+			$query .= " " . $this->getRelatedModulesQuery($module, $this->secondarymodule) .
+					getNonAdminAccessControlQuery($this->primarymodule, $current_user) .
+					" where vtiger_crmentity.deleted=0";
 		} else if ($module == "SalesOrder") {
 			$matrix = $this->queryPlanner->newDependencyMatrix();
 
@@ -4593,10 +4663,16 @@ class ReportRun extends CRMEntity {
 					$referenceTableName = 'vtiger_productsFaq';
 				} elseif ($moduleName == 'Invoice' && $referenceModule == 'SalesOrder' && $fieldName == "salesorder_id") {
 					$referenceTableName = 'vtiger_salesorderInvoice';
+				} elseif ($moduleName == 'Payment' && $referenceModule == 'PurchageOrder' && $fieldName == "salesorder_id") {
+					$referenceTableName = 'vtiger_purchaseorderPayment';
 				} elseif ($moduleName == 'Invoice' && $referenceModule == 'Contacts' && $fieldName == "contact_id") {
 					$referenceTableName = 'vtiger_contactdetailsInvoice';
+				} elseif ($moduleName == 'Payment' && $referenceModule == 'Contacts' && $fieldName == "contact_id") {
+					$referenceTableName = 'vtiger_contactdetailsPayment';
 				} elseif ($moduleName == 'Invoice' && $referenceModule == 'Accounts' && $fieldName == "account_id") {
 					$referenceTableName = 'vtiger_accountInvoice';
+				} elseif ($moduleName == 'Payment' && $referenceModule == 'Accounts' && $fieldName == "account_id") {
+					$referenceTableName = 'vtiger_accountPayment';
 				} elseif ($moduleName == 'Potentials' && $referenceModule == 'Campaigns' && $fieldName == "campaignid") {
 					$referenceTableName = 'vtiger_campaignPotentials';
 				} elseif ($moduleName == 'Products' && $referenceModule == 'Vendors' && $fieldName == "vendor_id") {
