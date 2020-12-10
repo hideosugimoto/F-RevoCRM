@@ -2362,11 +2362,11 @@ class CRMEntity {
 			array_push($params,"Events");
 		}
 
-		$fields_query = $adb->pquery("SELECT vtiger_field.fieldname,vtiger_field.tablename,vtiger_field.fieldid from vtiger_field INNER JOIN vtiger_tab on vtiger_tab.name IN (".  generateQuestionMarks($params).") WHERE vtiger_tab.tabid=vtiger_field.tabid AND vtiger_field.uitype IN (10) AND vtiger_field.presence IN (0,2)", $params);
+		$fields_query = $adb->pquery("SELECT vtiger_field.columnname,vtiger_field.tablename,vtiger_field.fieldid from vtiger_field INNER JOIN vtiger_tab on vtiger_tab.name IN (".  generateQuestionMarks($params).") WHERE vtiger_tab.tabid=vtiger_field.tabid AND vtiger_field.uitype IN (10) AND vtiger_field.presence IN (0,2)", $params);
 
 		if ($adb->num_rows($fields_query) > 0) {
 			for ($i = 0; $i < $adb->num_rows($fields_query); $i++) {
-				$field_name = $adb->query_result($fields_query, $i, 'fieldname');
+				$field_name = $adb->query_result($fields_query, $i, 'columnname');
 				$field_id = $adb->query_result($fields_query, $i, 'fieldid');
 				$tab_name = $adb->query_result($fields_query, $i, 'tablename');
 				$ui10_modules_query = $adb->pquery("SELECT relmodule FROM vtiger_fieldmodulerel WHERE fieldid=?", array($field_id));
