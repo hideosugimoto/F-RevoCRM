@@ -250,63 +250,87 @@ class Accounts extends CRMEntity {
 		return $return_value;
 	}
 
-	/** Returns a list of the associated contacts
-	 * Portions created by SugarCRM are Copyright (C) SugarCRM, Inc..
-	 * All Rights Reserved..
-	 * Contributor(s): ______________________________________..
-	 */
-	function get_purchaseorder($id, $cur_tab_id, $rel_tab_id, $actions=false) {
-		global $log, $singlepane_view,$currentModule,$current_user;
-		$log->debug("Entering get_purchaseorder(".$id.") method ...");
-		$this_module = $currentModule;
+    /** Returns a list of the associated contacts
+     * Portions created by SugarCRM are Copyright (C) SugarCRM, Inc..
+     * All Rights Reserved..
+     * Contributor(s): ______________________________________..
+     */
+    function get_purchaseorder($id, $cur_tab_id, $rel_tab_id, $actions=false)
+    {
+        global $log, $singlepane_view,$currentModule,$current_user;
+        $log->debug("Entering get_purchaseorder(".$id.") method ...");
+        $this_module = $currentModule;
 
-		$related_module = vtlib_getModuleNameById($rel_tab_id);
-		require_once("modules/$related_module/$related_module.php");
-		$other = new $related_module();
-		vtlib_setup_modulevars($related_module, $other);
-		$singular_modname = vtlib_toSingular($related_module);
-		$parenttab = getParentTab();
+        $related_module = vtlib_getModuleNameById($rel_tab_id);
+        require_once("modules/$related_module/$related_module.php");
+        $other = new $related_module();
+        vtlib_setup_modulevars($related_module, $other);
+        $singular_modname = vtlib_toSingular($related_module);
+        $parenttab = getParentTab();
 
-		if($singlepane_view == 'true')
-			$returnset = '&return_module='.$this_module.'&return_action=DetailView&return_id='.$id;
-		else
-			$returnset = '&return_module='.$this_module.'&return_action=CallRelatedList&return_id='.$id;
+        if ($singlepane_view == 'true') {
+            $returnset = '&return_module='.$this_module.'&return_action=DetailView&return_id='.$id;
+        } else {
+            $returnset = '&return_module='.$this_module.'&return_action=CallRelatedList&return_id='.$id;
+        }
 
-		$button = '';
-		if($actions && getFieldVisibilityPermission($related_module, $current_user->id, 'account_id','readwrite') == '0') {
-			if(is_string($actions)) $actions = explode(',', strtoupper($actions));
-			if(in_array('SELECT', $actions) && isPermitted($related_module,4, '') == 'yes') {
-				$button .= "<input title='".getTranslatedString('LBL_SELECT')." ". getTranslatedString($related_module). "' class='crmbutton small edit' type='button' onclick=\"return window.open('index.php?module=$related_module&return_module=$currentModule&action=Popup&popuptype=detailview&select=enable&form=EditView&form_submit=false&recordid=$id&parenttab=$parenttab','test','width=640,height=602,resizable=0,scrollbars=0');\" value='". getTranslatedString('LBL_SELECT'). " " . getTranslatedString($related_module) ."'>&nbsp;";
-			}
-			if(in_array('ADD', $actions) && isPermitted($related_module,1, '') == 'yes') {
-				$button .= "<input title='".getTranslatedString('LBL_ADD_NEW'). " ". getTranslatedString($singular_modname) ."' class='crmbutton small create'" .
-					" onclick='this.form.action.value=\"EditView\";this.form.module.value=\"$related_module\"' type='submit' name='button'" .
-					" value='". getTranslatedString('LBL_ADD_NEW'). " " . getTranslatedString($singular_modname) ."'>&nbsp;";
-			}
-		}
+        $button = '';
+        if ($actions && getFieldVisibilityPermission($related_module, $current_user->id, 'account_id', 'readwrite') == '0') {
+            if (is_string($actions)) {
+                $actions = explode(',', strtoupper($actions));
+            }
+            if (in_array('SELECT', $actions) && isPermitted($related_module, 4, '') == 'yes') {
+                $button .= "<input title='".getTranslatedString('LBL_SELECT')." ". getTranslatedString($related_module). "' class='crmbutton small edit' type='button' onclick=\"return window.open('index.php?module=$related_module&return_module=$currentModule&action=Popup&popuptype=detailview&select=enable&form=EditView&form_submit=false&recordid=$id&parenttab=$parenttab','test','width=640,height=602,resizable=0,scrollbars=0');\" value='". getTranslatedString('LBL_SELECT'). " " . getTranslatedString($related_module) ."'>&nbsp;";
+            }
+            if (in_array('ADD', $actions) && isPermitted($related_module, 1, '') == 'yes') {
+                $button .= "<input title='".getTranslatedString('LBL_ADD_NEW'). " ". getTranslatedString($singular_modname) ."' class='crmbutton small create'" .
+                    " onclick='this.form.action.value=\"EditView\";this.form.module.value=\"$related_module\"' type='submit' name='button'" .
+                    " value='". getTranslatedString('LBL_ADD_NEW'). " " . getTranslatedString($singular_modname) ."'>&nbsp;";
+            }
+        }
 
-		$userNameSql = getSqlForNameInDisplayFormat(array('last_name' => 'vtiger_users.last_name', 'first_name'=> 'vtiger_users.first_name', ), 'Users');
-		$query = "SELECT vtiger_purchaseorder.*, vtiger_crmentity.crmid, vtiger_crmentity.smownerid,
-			case when (vtiger_users.user_name not like '') then $userNameSql else vtiger_groups.groupname end as user_name
-			FROM vtiger_purchaseorder
-			INNER JOIN vtiger_crmentity ON vtiger_crmentity.crmid = vtiger_purchaseorder.purchaseorderid
-			LEFT JOIN vtiger_purchaseordercf ON vtiger_purchaseordercf.purchaseorderid = vtiger_purchaseorder.purchaseorderid
-			LEFT JOIN vtiger_poshipads ON vtiger_poshipads.poshipaddressid = vtiger_purchaseorder.purchaseorderid
-			LEFT JOIN vtiger_pobillads ON vtiger_pobillads.pobilladdressid = vtiger_purchaseorder.purchaseorderid
-			LEFT JOIN vtiger_account ON vtiger_account.accountid = vtiger_purchaseorder.accountid
-			LEFT JOIN vtiger_groups	ON vtiger_groups.groupid = vtiger_crmentity.smownerid
-			LEFT JOIN vtiger_users ON vtiger_crmentity.smownerid = vtiger_users.id
-			WHERE vtiger_crmentity.deleted = 0
-			AND vtiger_purchaseorder.accountid = ".$id;
+        $userNameSql = getSqlForNameInDisplayFormat(array('last_name' => 'vtiger_users.last_name', 'first_name'=> 'vtiger_users.first_name', ), 'Users');
+        $query = "SELECT
+					vtiger_purchaseorder.*
+					, vtiger_crmentity.crmid
+					, vtiger_crmentity.smownerid
+					, CASE 
+						WHEN (vtiger_users.user_name NOT LIKE '') 
+							THEN $userNameSql 
+						ELSE vtiger_groups.groupname 
+						END AS user_name 
+				FROM
+					vtiger_purchaseorder 
+					INNER JOIN vtiger_crmentity 
+						ON vtiger_crmentity.crmid = vtiger_purchaseorder.purchaseorderid 
+					LEFT JOIN vtiger_purchaseordercf 
+						ON vtiger_purchaseordercf.purchaseorderid = vtiger_purchaseorder.purchaseorderid 
+					LEFT JOIN vtiger_poshipads 
+						ON vtiger_poshipads.poshipaddressid = vtiger_purchaseorder.purchaseorderid 
+					LEFT JOIN vtiger_pobillads 
+						ON vtiger_pobillads.pobilladdressid = vtiger_purchaseorder.purchaseorderid 
+					LEFT JOIN vtiger_account 
+						ON vtiger_account.accountid = vtiger_purchaseorder.accountid 
+					LEFT JOIN vtiger_groups 
+						ON vtiger_groups.groupid = vtiger_crmentity.smownerid 
+					LEFT JOIN vtiger_users 
+						ON vtiger_crmentity.smownerid = vtiger_users.id 
+				WHERE
+					vtiger_crmentity.deleted = 0 
+					AND vtiger_purchaseorder.accountid =
+				".$id;
 
-		$return_value = GetRelatedList($this_module, $related_module, $other, $query, $button, $returnset);
+        $return_value = GetRelatedList($this_module, $related_module, $other, $query, $button, $returnset);
 
-		if($return_value == null) $return_value = Array();
-		$return_value['CUSTOM_BUTTON'] = $button;
+        if ($return_value == null) {
+            $return_value = array();
+        }
+        $return_value['CUSTOM_BUTTON'] = $button;
 
-		$log->debug("Exiting get_purchaseorder method ...");
-		return $return_value;
-	}
+        $log->debug("Exiting get_purchaseorder method ...");
+        return $return_value;
+    }
+
 
 	/** Returns a list of the associated opportunities
 	 * Portions created by SugarCRM are Copyright (C) SugarCRM, Inc..

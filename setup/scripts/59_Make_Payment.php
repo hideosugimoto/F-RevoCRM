@@ -270,7 +270,7 @@ $field->table = 'vtiger_payment';
 $field->column = 'accountid';
 $field->columntype = 'int';
 $field->uitype = 73;
-$field->typeofdata = 'I~M';
+$field->typeofdata = 'I~O';
 $field->masseditable = 1;
 $field->quickcreate = 1;
 $field->summaryfield = 1;
@@ -450,6 +450,24 @@ $field->setRelatedModules(array('Potentials'));
 $oppModuleModel = Vtiger_Module_Model::getInstance('Potentials');
 $oppModuleModel->setRelatedlist($module, 'Payment', array('ADD'), 'get_dependents_list', $field->id);
 
+//発注先
+$field = new Vtiger_Field();
+$field->name = 'vendor_id';
+$field->table = 'vtiger_payment';
+$field->column = 'vendorid';
+$field->columntype = 'varchar(100)';
+$field->uitype = 81;
+$field->typeofdata = 'I~O';
+$field->masseditable = 1;
+$field->quickcreate = 3;
+$field->summaryfield = 1;
+$field->label = 'Vendor Name';
+$field->displaytype = 1;
+$blockInstance->addField($field);
+$field->setRelatedModules(array('Vendors'));
+
+$oppModuleModel = Vtiger_Module_Model::getInstance('Vendors');
+$oppModuleModel->setRelatedlist($module, 'Payment', array('ADD'), 'get_payments', $field->id);
 
 // 入力方法
 $field = new Vtiger_Field();
