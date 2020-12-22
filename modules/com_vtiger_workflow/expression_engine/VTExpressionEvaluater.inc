@@ -235,6 +235,29 @@ function __vt_get_date($arr) {
 	}
 }
 
+function __vt_get_specified_date($arr)
+{
+    if (count($arr)>1) {
+        $specifieddate = empty($arr[0]) ? date('Y-m-d') : $arr[0];
+        $datelanguages = $arr[1];
+        $calculationresult = strtotime($datelanguages, strtotime(date($specifieddate)));
+        if (empty($calculationresult)) {
+			global $log;
+			$log->warn("function name:".__FUNCTION__."/ line number:".__LINE__);
+			$log->warn("strtotime is return false. strtotime($datelanguages, strtotime(date($specifieddate)))");
+            return date('Y-m-d');
+        } else {
+            return date('Y-m-d', $calculationresult);
+        }
+    } else {
+		//未指定の場合は現在の年月日を設定する
+		global $log;
+		$log->warn("function name:".__FUNCTION__."/ line number:".__LINE__);
+		$log->warn("variable is not found.");
+        return date('Y-m-d');
+    }
+}
+
 function __vt_add_time($arr) {
 	if(count($arr) > 1) {
 		$baseTime = $arr[0];
@@ -291,7 +314,8 @@ class VTFieldExpressionEvaluater{
 				'get_date' => '__vt_get_date',
 				'add_time' => '__vt_add_time',
 				'sub_time' => '__vt_sub_time',
-				'power'	   => '__vt_power'
+				'power'	   => '__vt_power',
+				'get_specified_date' => '__vt_get_specified_date',
 		);
 
 		$this->operations = array_merge($this->functions, $this->operators);

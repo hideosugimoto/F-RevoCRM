@@ -84,6 +84,14 @@ $languageStrings = array(
 	'LBL_NOTIFY_OWNER' => 'notify_owner',
 	'LBL_ANNUAL_REVENUE' => '年間売上',
 	'LBL_EXPRESSION_EXAMPLE2' => "if mailingcountry == 'India' then concat(firstname,' ',lastname) else concat(lastname,' ',firstname) end",
+	'LBL_EXPRESSION_EXAMPLE3' => "get_specified_date(datefield,'datelanguage')<br>
+		&emsp;datelanguage&emsp;ex:datefield=2020-01-01<br>
+		&emsp;-&emsp;first day of next month&emsp;->&emsp;2020-02-01<br>
+		&emsp;-&emsp;last day of next month&emsp;->&emsp;2020-02-28<br>
+		&emsp;-&emsp;first day of this month&emsp;->&emsp;2020-01-01<br>
+		&emsp;-&emsp;last day of this month&emsp;->&emsp;2020-01-31<br>
+		&emsp;-&emsp;first day of last month&emsp;->&emsp;2020-12-01<br>
+		&emsp;-&emsp;last day of last month&emsp;->&emsp;2020-12-31",
 	'LBL_FROM' => 'From',
 	'LBL_RUN_WORKFLOW' => 'ワークフローを実行',
 	'LBL_AT_TIME' => '時刻',
