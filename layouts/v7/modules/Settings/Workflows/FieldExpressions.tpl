@@ -75,6 +75,8 @@
                 <p><h5>{vtranslate('LBL_EXAMPLE_EXPRESSION',$QUALIFIED_MODULE)}</h5></p>
                 <p>{vtranslate('LBL_ANNUAL_REVENUE',$QUALIFIED_MODULE)}/12</p>
                 <p>{vtranslate('LBL_EXPRESSION_EXAMPLE2',$QUALIFIED_MODULE)}</p>
+                <p></p>
+                <p>{vtranslate('LBL_EXPRESSION_EXAMPLE3',$QUALIFIED_MODULE)}</p>
             </div>
         </div>
         {include file="ModalFooter.tpl"|vtemplate_path:$MODULE}
