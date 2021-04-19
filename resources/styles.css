@@ -221,8 +221,9 @@ div.detailview-content.container-fluid span.value img {
 @media all and (min-width: 0px) and (max-width: 830px) {
   .detailview-table .fieldLabel,
   .recordEditView .fieldLabel,
-  .summaryView .fieldLabel{
-      text-align: left;
+  .summaryView .fieldLabel,
+  .detailViewInfo.userPreferences .table.detailview-table .fieldLabel{
+    text-align: left;
   }
 }
 .settingsIndexPage .settingsSummary a {
@@ -249,4 +250,17 @@ div.detailview-content.container-fluid span.value img {
 .related_field_caution{
   margin-top: 10px;
   float: left;
+}
+/* 概要画面の関連項目 */
+.summaryView .input-group.editElement {
+  min-width: auto;
+}
+.summaryView .input-group.editElement .referencefield-wrapper {
+  width: 100% ;
+}
+.summaryView .input-group.editElement .referencefield-wrapper .input-group {
+  min-width: auto;
+}
+.summaryView .input-group.editElement .referencefield-wrapper .input-group .inputElement {
+  width: 100% ;
 }

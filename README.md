@@ -24,7 +24,7 @@ Vtiger Public License 1.2
   * sql_mode = NO_ENGINE_SUBSTITUTION for MySQL 5.6+
 
 ## PCの推奨環境
-* Windows 10 Google Chrome最新 / Microsoft Edge(Chronium)最新 / Internet Explorer 11（非推奨に移行予定）
+* Windows 10 Google Chrome最新 / Microsoft Edge(Chronium)最新 / Internet Explorer 11（2022年4月 非推奨に移行予定）
 * 最低1366×768以上の解像度、推奨1920×1080以上
 * 最低Intel Core iシリーズまたはそれ以上の2コア以上のプロセッサ、推奨4コア以上
 * 最低4GB以上のメモリ、推奨8GB以上
@@ -154,6 +154,37 @@ cp -r frevocrm.20201001/storage/* frevocrm/storage/
 # コマンド例
 rm -r frevocrm.20170118
 ```
+
+## 開発環境の構築
+Dockerで構築する為、[docker/README.md](./docker/README.md)を参照してください。  
+
+### xdebug
+xdebug3がインストール済みです。
+`docker-compose.yml` の以下の部分を修正してください
+```yml
+# Xdebugの設定を有効にしたい場合は、mode=debug に変更してください
+# XDEBUG_CONFIG: "mode=off client_host=host.docker.internal client_port=9003 start_with_request=yes"
+XDEBUG_CONFIG: "mode=debug client_host=host.docker.internal client_port=9003 start_with_request=yes"
+```
+
+vscodeをご利用の場合は、以下のように `.vscode/launch.json`を修正してください。
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+      {
+       "name": "F-RevoCRM XDebug:9003",
+       "type": "php",
+       "request": "launch",
+       "port": 9003, 
+       "pathMappings": {
+          "/var/www/html": "${workspaceRoot}"
+       }
+      }
+  ]
+ }
+```
+
 ## 更新履歴
 
 ### F-RevoCRM7.3.2
